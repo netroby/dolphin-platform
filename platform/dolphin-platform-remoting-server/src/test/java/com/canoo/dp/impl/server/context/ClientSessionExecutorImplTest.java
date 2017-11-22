@@ -71,16 +71,21 @@ public class ClientSessionExecutorImplTest {
         }
     }
 
-    @Test(expectedExceptions = {ExecutionException.class})
+    @Test
         public void testIfExceptionWillThrown() throws ExecutionException, InterruptedException {
         final ClientSessionExecutor executor = new ClientSessionExecutorImpl(Executors.newSingleThreadExecutor());
 
-        executor.runLaterInClientSession(new Runnable() {
-            @Override
-            public void run() {
-                throw new RuntimeException("Test");
-            }
-        }).get();
+        try {
+            executor.runLaterInClientSession(new Runnable() {
+                @Override
+                public void run() {
+                    throw new RuntimeException("Test");
+                }
+            }).get();
+        } catch (ExecutionException e) {
+            Assert.assertTrue(e.getCause() instanceof RuntimeException);
+            Assert.assertEquals(e.getCause().getMessage(), "Test");
+        }
 
     }
 
